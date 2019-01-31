@@ -98,11 +98,25 @@ export class MaskedInputDirective implements ControlValueAccessor, OnChanges {
       this._setupMask()
 
       if (this.textMaskInputElement !== undefined) {
+        const DECIMAL_SEPARATOR_JAVASCRIPT = '.'
+        const DECIMAL_SEPARATOR_CUSTOM = ','
+        const indexOfPeriodBeforeUpdate = this.inputElement.value.indexOf(DECIMAL_SEPARATOR_JAVASCRIPT)
+        const indexOfCommaBeforeUpdate = this.inputElement.value.indexOf(DECIMAL_SEPARATOR_CUSTOM)
+        const containsPeriod = this.inputElement.value.includes(DECIMAL_SEPARATOR_JAVASCRIPT)
+        const isPeriodAfterComma = indexOfPeriodBeforeUpdate > indexOfCommaBeforeUpdate
+
         this.textMaskInputElement.update(value)
-        
+
         // get the updated value
         value = this.inputElement.value
         this.onChange(value)
+
+        const hasCommaAfterUpdate = this.inputElement.value.includes(DECIMAL_SEPARATOR_CUSTOM)
+        if (containsPeriod && isPeriodAfterComma && hasCommaAfterUpdate) {
+          const indexOfCommaAfterUpdate = this.inputElement.value.indexOf(',')
+          this.inputElement.selectionStart = indexOfCommaAfterUpdate + 1
+          this.inputElement.selectionEnd = indexOfCommaAfterUpdate + 1
+        }
       }
     }
   }
